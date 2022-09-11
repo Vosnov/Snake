@@ -143,21 +143,17 @@ export class HamiltonCycle extends Draw {
   }
 
   draw() {
-    const {ctx, path, canvas, n, lineWidth, lineColor, step: cellSize} = this
-
-    const w = canvas.width;
-    const h = canvas.height;
-
-    const sw = w / n;
-    const sh = h / n;
+    const {ctx, path, n, lineWidth, lineColor, step} = this
 
     ctx.lineWidth = lineWidth;
-    const size = cellSize
+    const size = step
+    const sift = 0.5
     ctx.beginPath();
-    ctx.moveTo(path[0].x * sw + size, path[0].y * sh + size);
+    ctx.moveTo((path[0].x + sift ) * size, (path[0].y + sift ) *  size);
     const nsq = n * n;
     for (let i = 1; i < nsq; i++) {
-        ctx.lineTo(path[i].x * sw + size, + path[i].y * sh + size);
+      ctx.lineTo((path[i].x + sift ) * size, + (path[i].y + sift ) * size);
+      ctx.moveTo((path[i].x + sift ) * size, + (path[i].y + sift ) * size);
     }
     ctx.strokeStyle = lineColor
     ctx.stroke();

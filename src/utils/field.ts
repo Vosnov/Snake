@@ -9,7 +9,8 @@ export class Field {
   snake: Snake
   hamiltonCycle: HamiltonCycle
   apple: Apple
-  step = 20
+  step = 40 
+  n = 6
 
   constructor(private canvas: HTMLCanvasElement) {
     this.canvas = canvas
@@ -18,11 +19,11 @@ export class Field {
 
     this.snake = new Snake(canvas, this.step)
 
-    this.hamiltonCycle = new HamiltonCycle(canvas, 20, 10, 1)
+    this.hamiltonCycle = new HamiltonCycle(canvas, this.n, this.step, 1)
     this.hamiltonCycle.generateHamiltonianCircuit()
     this.hamiltonCycle.draw()
 
-    this.apple =  new Apple(canvas, this.step)
+    this.apple =  new Apple(canvas, this.n, this.step)
     this.apple.x = this.hamiltonCycle.path[10].x
     this.apple.y = this.hamiltonCycle.path[10].y
 
@@ -45,9 +46,8 @@ export class Field {
     this.hamiltonCycle.draw()
     this.apple.draw()
 
-
-    if (this.snake.x / this.step === this.apple.x && this.snake.y / this.step === this.apple.y) {
-      console.log('hello')
+    const snakePos = this.snake.getPosition()
+    if (snakePos.x === this.apple.x && snakePos.y === this.apple.y) {
       this.apple.randomSpawn()
       this.snake.addTail()
     }

@@ -1,15 +1,14 @@
 import { Draw } from "./draw"
+import { Position } from "./point"
 
 export type TailPosition = {
   x: number
   y: number
 }
-export type SnakeDirection = [1 | 0 | -1, 1 | 0 | -1]
 
 export class Snake extends Draw {
-  x = 0
-  y = 0
-  direction: SnakeDirection = [1, 1]
+  private x = 0
+  private y = 0
   color = '#FFF'
   tails: TailPosition[] = []
   dividerSize = 2;
@@ -74,9 +73,8 @@ export class Snake extends Draw {
     ctx.closePath()
   }
 
-  go(x?: number, y?: number) {
-    const {direction, step} = this
-    const [dirX, dirY] = direction
+  go(x: number, y: number) {
+    const {step} = this
 
     if (this.tails.length !== 0) {
       for (let i = 0; i < this.tails.length - 1; i++) {
@@ -85,13 +83,8 @@ export class Snake extends Draw {
       this.tails[this.tails.length - 1] = {x: this.x, y: this.y}
     }
     
-    if (x !== undefined && y !== undefined) {
-      this.x = x * step
-      this.y = y * step
-    } else {
-      this.x += dirX * step
-      this.y += dirY * step
-    }
+    this.x = x * step
+    this.y = y * step
   }
 
   addTail() {
@@ -99,12 +92,8 @@ export class Snake extends Draw {
     this.tails.push({x, y})
   }
 
-  changeDirection(dir: SnakeDirection | number[]) {
-    const convertDir = dir.map(item => {
-      if (item === 0) return 0
-      if (item > 0) return 1
-      return -1
-    })
-    this.direction = (convertDir as SnakeDirection)
+  getPosition(): Position {
+    const {x, y, step} = this
+    return {x: x / step, y: y / step}
   }
 }

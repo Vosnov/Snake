@@ -5,7 +5,7 @@ export class Apple extends Draw {
   y: number = 0
   fillColor = 'yellow'
 
-  constructor(canvas: HTMLCanvasElement, private n: number, step?: number, ) {
+  constructor(canvas: HTMLCanvasElement, private n: number, step?: number ) {
     super(canvas, step)
     this.n = n
   }

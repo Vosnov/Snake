@@ -15,7 +15,7 @@ export const Field: FC = () => {
 
   return (
     <div>
-      <canvas width={400} height={400} ref={canvasRef}></canvas>
+      <canvas width={800} height={800} ref={canvasRef}></canvas>
     </div>
   )
 }
