@@ -1,16 +1,12 @@
 import { Draw } from "./draw"
 import { Position } from "./point"
 
-export type TailPosition = {
-  x: number
-  y: number
-}
 
 export class Snake extends Draw {
   private x = 0
   private y = 0
   color = '#FFF'
-  tails: TailPosition[] = []
+  private tails: Position[] = []
   dividerSize = 2;
   dividerStep = this.step - this.dividerSize
   dividerPosition = this.dividerSize / 2
@@ -47,7 +43,7 @@ export class Snake extends Draw {
     })
   }
 
-  drawTailDivider(tail: TailPosition, nextTail: TailPosition) {
+  drawTailDivider(tail: Position, nextTail: Position) {
     const {step, ctx, color, dividerSize, dividerPosition, dividerStep} = this
 
     let tailX = tail.x - dividerPosition
@@ -95,5 +91,9 @@ export class Snake extends Draw {
   getPosition(): Position {
     const {x, y, step} = this
     return {x: x / step, y: y / step}
+  }
+  
+  getTails(): Position[] {
+    return this.tails.map(t => ({x: t.x / this.step, y: t.y / this.step}))
   }
 }

@@ -1,24 +1,22 @@
 import { Apple } from "./apple"
+import { Draw } from "./draw"
 import { HamiltonCycle } from "./hamiltonCycle"
 import { Position } from "./point"
 import { Snake } from "./snake"
 
-export class Field {
+export class Field extends Draw {
   fieldColor = '#000000'
-  ctx: CanvasRenderingContext2D
   snake: Snake
   hamiltonCycle: HamiltonCycle
   apple: Apple
-  step = 40 
   timer?: NodeJS.Timer
   showPath = true
 
   playStepPos = 0
   playNextPath: Position
 
-  constructor(private canvas: HTMLCanvasElement, private countV = 6) {
-    this.canvas = canvas
-    this.ctx = (canvas.getContext('2d') as CanvasRenderingContext2D)
+  constructor(canvas: HTMLCanvasElement, private countV = 6, step = 40) {
+    super(canvas, step);
     this.clearField()
     this.countV = countV;
 
@@ -45,28 +43,45 @@ export class Field {
     this.ctx.closePath()
   }
 
-  logic(nextPath: Position) {
-    this.clearField()
-    
-    this.snake.go(nextPath.x, nextPath.y)
-    this.snake.draw()
-    if (this.showPath) this.hamiltonCycle.draw()
-    this.apple.draw()
-
+  checkApple() {
     const snakePos = this.snake.getPosition()
     if (snakePos.x === this.apple.x && snakePos.y === this.apple.y) {
-      this.apple.randomSpawn()
+      const freePosition: Position[] = [] 
+      this.hamiltonCycle.path.forEach(position => {
+        if (snakePos.x === position.x && snakePos.y === position.y) return
+        
+        const tails = this.snake.getTails()
+        const stringTails = tails.map(t => `x${t.x}y${t.y}`)
+        if (!stringTails.includes(`x${position.x}y${position.y}`)) {
+          freePosition.push(position)
+        }
+
+        if (tails.length === 0) {
+          freePosition.push(position)
+        }
+      })
+      this.apple.randomSpawn(freePosition)
       this.snake.addTail()
     }
   }
 
+  logic() {
+    this.clearField()
+    
+    this.snake.go(this.playNextPath.x, this.playNextPath.y)
+
+    this.checkApple()
+
+    this.playStepPos++
+    if (this.playStepPos === this.hamiltonCycle.path.length) this.playStepPos = 0
+    this.playNextPath = this.hamiltonCycle.path[this.playStepPos]
+
+    this.draw()
+  }
+
   setInterval(speed = 60) {
     this.timer = setInterval(() => {
-      this.logic(this.playNextPath)
-      
-      this.playStepPos++
-      if (this.playStepPos === this.hamiltonCycle.path.length) this.playStepPos = 0
-      this.playNextPath = this.hamiltonCycle.path[this.playStepPos]
+      this.logic()
     }, speed)
   }
 
@@ -83,15 +98,19 @@ export class Field {
 
   addListeners() {
     window.addEventListener('keydown', (e) => {
-      const {snake, hamiltonCycle, apple} = this
+      const {snake} = this
 
       if (e.key === ' ') {
         this.clearField()
         snake.addTail()
-        snake.draw()
-        hamiltonCycle.draw()
-        apple.draw()
+        this.draw()
       }
     })
+  }
+
+  draw(): void {
+    this.snake.draw()
+    if (this.showPath) this.hamiltonCycle.draw()
+    this.apple.draw()
   }
 }

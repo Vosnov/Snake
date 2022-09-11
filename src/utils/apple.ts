@@ -1,4 +1,5 @@
 import { Draw } from "./draw"
+import { Position } from "./point"
 
 export class Apple extends Draw {
   x: number = 0
@@ -10,9 +11,12 @@ export class Apple extends Draw {
     this.n = n
   }
 
-  randomSpawn() {
-    this.x = this.randomInteger(0, this.n - 1)
-    this.y = this.randomInteger(0, this.n - 1)
+  randomSpawn(positions: Position[] ) {
+    if (positions.length === 0) return
+
+    const rndIndex = this.randomInteger(0, positions.length - 1)
+    this.x = positions[rndIndex].x
+    this.y = positions[rndIndex].y
   }
 
   draw() {
