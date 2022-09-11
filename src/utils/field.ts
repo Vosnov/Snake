@@ -10,25 +10,32 @@ export class Field {
   hamiltonCycle: HamiltonCycle
   apple: Apple
   step = 40 
-  n = 6
+  timer?: NodeJS.Timer
+  showPath = true
 
-  constructor(private canvas: HTMLCanvasElement) {
+  playStepPos = 0
+  playNextPath: Position
+
+  constructor(private canvas: HTMLCanvasElement, private countV = 6) {
     this.canvas = canvas
     this.ctx = (canvas.getContext('2d') as CanvasRenderingContext2D)
     this.clearField()
+    this.countV = countV;
 
     this.snake = new Snake(canvas, this.step)
 
-    this.hamiltonCycle = new HamiltonCycle(canvas, this.n, this.step, 1)
+    this.hamiltonCycle = new HamiltonCycle(canvas, this.countV, this.step, 1)
     this.hamiltonCycle.generateHamiltonianCircuit()
     this.hamiltonCycle.draw()
 
-    this.apple =  new Apple(canvas, this.n, this.step)
+    this.apple =  new Apple(canvas, this.countV, this.step)
     this.apple.x = this.hamiltonCycle.path[10].x
     this.apple.y = this.hamiltonCycle.path[10].y
 
-    this.startPlay()
+    this.setInterval()
     this.addListeners()
+
+    this.playNextPath = this.hamiltonCycle.path[this.playStepPos]
   }
 
   clearField() {
@@ -43,7 +50,7 @@ export class Field {
     
     this.snake.go(nextPath.x, nextPath.y)
     this.snake.draw()
-    this.hamiltonCycle.draw()
+    if (this.showPath) this.hamiltonCycle.draw()
     this.apple.draw()
 
     const snakePos = this.snake.getPosition()
@@ -53,17 +60,25 @@ export class Field {
     }
   }
 
-  startPlay() {
-    let stepPos = 0
-    let nextPath = this.hamiltonCycle.path[stepPos]
-
-    setInterval(() => {
-      this.logic(nextPath)
+  setInterval(speed = 60) {
+    this.timer = setInterval(() => {
+      this.logic(this.playNextPath)
       
-      stepPos++
-      if (stepPos === this.hamiltonCycle.path.length) stepPos = 0
-      nextPath = this.hamiltonCycle.path[stepPos]
-    }, 60)
+      this.playStepPos++
+      if (this.playStepPos === this.hamiltonCycle.path.length) this.playStepPos = 0
+      this.playNextPath = this.hamiltonCycle.path[this.playStepPos]
+    }, speed)
+  }
+
+  clear() {
+    if (this.timer) {
+      clearInterval(this.timer)
+    }
+  }
+
+  changeSpeed(speed: number) {
+    this.clear()
+    this.setInterval(speed)
   }
 
   addListeners() {
