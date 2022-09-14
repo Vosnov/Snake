@@ -14,10 +14,11 @@ export class Snake extends Draw {
   draw() {
     const {x, y, ctx, color, tails, dividerPosition, dividerStep} = this
     ctx.beginPath()
-    ctx.fillStyle = color
+    ctx.fillStyle = 'blue'
 
     ctx.fillRect(dividerPosition + x, dividerPosition + y, dividerStep, dividerStep)
     tails.forEach(tail => {
+      ctx.fillStyle = color
       ctx.fillRect(tail.x + dividerPosition, tail.y + dividerPosition, dividerStep, dividerStep)
     })
     ctx.beginPath()
@@ -69,7 +70,7 @@ export class Snake extends Draw {
     ctx.closePath()
   }
 
-  go(x: number, y: number) {
+  go({x, y}: Position) {
     const {step} = this
 
     if (this.tails.length !== 0) {
@@ -95,5 +96,9 @@ export class Snake extends Draw {
   
   getTails(): Position[] {
     return this.tails.map(t => ({x: t.x / this.step, y: t.y / this.step}))
+  }
+
+  getTailsLength() {
+    return this.tails.length
   }
 }
