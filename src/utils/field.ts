@@ -12,9 +12,6 @@ export class Field extends Draw {
   timer?: NodeJS.Timer
   showPath = true
 
-  playStepPos = 0
-  playNextPath: Position
-
   constructor(canvas: HTMLCanvasElement, private countV = 6, step = 40) {
     super(canvas, step);
     this.clearField()
@@ -32,8 +29,6 @@ export class Field extends Draw {
 
     this.setInterval()
     this.addListeners()
-
-    this.playNextPath = this.hamiltonCycle.path[this.playStepPos]
   }
 
   clearField() {
@@ -65,18 +60,73 @@ export class Field extends Draw {
     }
   }
 
-  logic() {
-    this.clearField()
-    
-    this.snake.go(this.playNextPath.x, this.playNextPath.y)
+  findPathIndex(pos: Position) {
+    const stringPath = this.hamiltonCycle.path.map(p => `x${p.x}y${p.y}`)
+    return stringPath.findIndex(p => p === `x${pos.x}y${pos.y}`)
+  }
 
+  calcDistance(startIndex: number, endIndex: number) {
+    const pathLength = this.hamiltonCycle.path.length;
+    if (endIndex - startIndex < 0) {
+      return pathLength - startIndex + endIndex
+    } else {
+      return endIndex - startIndex
+    }
+  }
+ 
+  logic() {
+    const snakePos = this.snake.getPosition()
+    const neighbors = this.getNeighbors(snakePos)
+    const stringPath = this.hamiltonCycle.path.map(p => `x${p.x}y${p.y}`)
+    const appleIndex = this.findPathIndex(this.apple)
+
+    const snakeIndex = stringPath.findIndex(p => p === `x${snakePos.x}y${snakePos.y}`)
+
+    let shortPath = this.hamiltonCycle.path[snakeIndex + 1] || this.hamiltonCycle.path[0]
+    let minDistance = this.calcDistance(snakeIndex + 1, appleIndex)
+    neighbors.forEach((neighbor) => {
+      const neighborIndex = this.findPathIndex(neighbor)
+      const calcDistance = this.calcDistance(neighborIndex, appleIndex)
+      if (calcDistance < minDistance && neighborIndex !== -1 && calcDistance > this.snake.getTailsLength() / 1.5) {
+        minDistance = calcDistance
+        shortPath = this.hamiltonCycle.path[neighborIndex]
+      }
+
+    })
+
+    if (this.snake.getTails().map(t => `x${t.x}y${t.y}`).includes(`x${shortPath.x}y${shortPath.y}`)) {
+      console.log('FAIL!')
+    }
+
+    this.snake.go(shortPath)
     this.checkApple()
 
-    this.playStepPos++
-    if (this.playStepPos === this.hamiltonCycle.path.length) this.playStepPos = 0
-    this.playNextPath = this.hamiltonCycle.path[this.playStepPos]
-
+    this.clearField()
     this.draw()
+  }
+
+  getNeighbors({x, y}: Position) {
+    const directions = [
+      [0, 1],
+      [0, - 1],
+      [1, 0],
+      [-1, 0]
+    ]
+
+    const neighbors: Position[] = [] 
+
+    directions.forEach(([dx, dy]) => {
+      if (x + dx < 0 || x + dx > this.countV) return
+      if (y + dy < 0 || y + dy > this.countV) return
+
+      const tails = this.snake.getTails()
+      const stringTails = tails.map(t => `x${t.x}y${t.y}`)
+      if (stringTails.includes(`x${x + dx}y${y + dy}`)) return
+
+      neighbors.push({x: x + dx, y: y + dy})
+    })
+
+    return neighbors;
   }
 
   setInterval(speed = 60) {
