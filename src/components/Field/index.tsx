@@ -8,6 +8,7 @@ export const Field: FC = () => {
   const [fSize, setFSize] = useState(10)
   const [speed, setSpeed] = useState(60)
   const [showPath, setShowPath] = useState(false)
+  const [isPlay, setIsPlay] = useState(true)
 
   useEffect(() => {
     if (canvasRef.current !== null) {
@@ -43,6 +44,17 @@ export const Field: FC = () => {
     setShowPath(e.target.checked)
   }, []) 
 
+  const onPlay = useCallback(() => {
+    setIsPlay(!isPlay)
+  }, [isPlay])
+
+  useEffect(() => {
+    if (isPlay) {
+      field?.setInterval(speed)
+    } else {
+      field?.clear()
+    }
+  }, [isPlay, speed, field])
 
   return (
     <div className="wrapper">
@@ -58,6 +70,8 @@ export const Field: FC = () => {
 
         <label htmlFor="path">Show Path:</label>
         <input id="path" onChange={showPathChange} checked={showPath} type="checkbox" />
+
+        <button onClick={onPlay}>{isPlay ? 'Stop' : 'Play'}</button>
       </div>
       <canvas width={cSize} height={cSize} ref={canvasRef}></canvas>
     </div>

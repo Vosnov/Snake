@@ -131,6 +131,7 @@ export class Field extends Draw {
   }
 
   setInterval(speed = 60) {
+    this.clear()
     this.timer = setInterval(() => {
       this.logic()
     }, speed)
