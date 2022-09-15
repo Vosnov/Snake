@@ -1,7 +1,0 @@
-export * from './grid'
-export * from './point'
-export * from './hamiltonCycle'
-export * from './snake'
-export * from './draw'
-export * from './apple'
-export * from './field'
