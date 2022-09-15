@@ -7,7 +7,7 @@ export const Field: FC = () => {
   const [cSize, setCSize] = useState(400);
   const [fSize, setFSize] = useState(10)
   const [speed, setSpeed] = useState(60)
-  const [showPath, setShowPath] = useState(true)
+  const [showPath, setShowPath] = useState(false)
 
   useEffect(() => {
     if (canvasRef.current !== null) {

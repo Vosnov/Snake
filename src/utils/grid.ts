@@ -28,7 +28,6 @@ export class Grid {
   }
   
   buildPath(traversalTree: Map<string, Point>, to: Point) {
-    console.log(traversalTree)
     let path = [to]
     let parent = traversalTree.get(to.convertCords())
     while (parent) {
@@ -53,7 +52,6 @@ export class Grid {
       visited.add(subtreeRoot.convertCords())
   
       if (subtreeRoot.convertCords() === toPoint.convertCords()) {
-        console.log(traversalTree)
         return this.buildPath(traversalTree, toPoint)
       }
       

@@ -10,7 +10,8 @@ export class Field extends Draw {
   hamiltonCycle: HamiltonCycle
   apple: Apple
   timer?: NodeJS.Timer
-  showPath = true
+  showPath = false
+  stringPath: string[] = []
 
   constructor(canvas: HTMLCanvasElement, private countV = 6, step = 40) {
     super(canvas, step);
@@ -21,7 +22,8 @@ export class Field extends Draw {
 
     this.hamiltonCycle = new HamiltonCycle(canvas, this.countV, this.step, 1)
     this.hamiltonCycle.generateHamiltonianCircuit()
-    this.hamiltonCycle.draw()
+
+    this.stringPath = this.hamiltonCycle.path.map(p => `x${p.x}y${p.y}`)
 
     this.apple =  new Apple(canvas, this.countV, this.step)
     this.apple.x = this.hamiltonCycle.path[10].x
@@ -61,8 +63,7 @@ export class Field extends Draw {
   }
 
   findPathIndex(pos: Position) {
-    const stringPath = this.hamiltonCycle.path.map(p => `x${p.x}y${p.y}`)
-    return stringPath.findIndex(p => p === `x${pos.x}y${pos.y}`)
+    return this.stringPath.findIndex(p => p === `x${pos.x}y${pos.y}`)
   }
 
   calcDistance(startIndex: number, endIndex: number) {
@@ -77,10 +78,9 @@ export class Field extends Draw {
   logic() {
     const snakePos = this.snake.getPosition()
     const neighbors = this.getNeighbors(snakePos)
-    const stringPath = this.hamiltonCycle.path.map(p => `x${p.x}y${p.y}`)
     const appleIndex = this.findPathIndex(this.apple)
 
-    const snakeIndex = stringPath.findIndex(p => p === `x${snakePos.x}y${snakePos.y}`)
+    const snakeIndex = this.findPathIndex(snakePos)
 
     let shortPath = this.hamiltonCycle.path[snakeIndex + 1] || this.hamiltonCycle.path[0]
     let minDistance = this.calcDistance(snakeIndex + 1, appleIndex)
@@ -95,6 +95,7 @@ export class Field extends Draw {
     })
 
     if (this.snake.getTails().map(t => `x${t.x}y${t.y}`).includes(`x${shortPath.x}y${shortPath.y}`)) {
+      this.clear()
       console.log('FAIL!')
     }
 

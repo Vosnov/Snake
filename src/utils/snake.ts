@@ -6,15 +6,16 @@ export class Snake extends Draw {
   private x = 0
   private y = 0
   color = '#FFF'
+  headColor = 'blue'
   private tails: Position[] = []
   dividerSize = 2;
   dividerStep = this.step - this.dividerSize
   dividerPosition = this.dividerSize / 2
 
   draw() {
-    const {x, y, ctx, color, tails, dividerPosition, dividerStep} = this
+    const {x, y, ctx, color, tails, dividerPosition, dividerStep, headColor} = this
     ctx.beginPath()
-    ctx.fillStyle = 'blue'
+    ctx.fillStyle = headColor
 
     ctx.fillRect(dividerPosition + x, dividerPosition + y, dividerStep, dividerStep)
     tails.forEach(tail => {
