@@ -9,6 +9,7 @@ export const Field: FC = () => {
   const [speed, setSpeed] = useState(60)
   const [showPath, setShowPath] = useState(false)
   const [isPlay, setIsPlay] = useState(true)
+  const [crawling, setCrawling] = useState(true)
 
   useEffect(() => {
     if (canvasRef.current !== null) {
@@ -40,21 +41,37 @@ export const Field: FC = () => {
     setSpeed(parseInt(e.target.value))
   }, []) 
 
-  const showPathChange =  useCallback<ChangeEventHandler<HTMLInputElement>>(e => {
+  const showPathChange = useCallback<ChangeEventHandler<HTMLInputElement>>(e => {
     setShowPath(e.target.checked)
-  }, []) 
+    if (field) field.showPath = e.target.checked
+  }, [field]) 
 
   const onPlay = useCallback(() => {
     setIsPlay(!isPlay)
-  }, [isPlay])
 
-  useEffect(() => {
-    if (isPlay) {
+    if (!isPlay) {
       field?.setInterval(speed)
     } else {
       field?.clear()
     }
-  }, [isPlay, speed, field])
+  }, [speed, field, isPlay])
+
+  const onRestart = useCallback(() => {
+    if (field) {
+      field.clear()
+    }
+    if (canvasRef.current !== null) {
+      const field = new FieldClass(canvasRef.current, fSize)
+      setField(field)
+    }
+  }, [canvasRef, fSize, field])
+
+  const onCrawling = useCallback(() => {
+    setCrawling(!crawling)
+    if (field) {
+      field.crawling = !crawling
+    }
+  }, [crawling, field])
 
   return (
     <div className="wrapper">
@@ -71,7 +88,11 @@ export const Field: FC = () => {
         <label htmlFor="path">Show Path:</label>
         <input id="path" onChange={showPathChange} checked={showPath} type="checkbox" />
 
+        <label htmlFor="crawling">Enable crawling:</label>
+        <input id="crawling" onChange={onCrawling} checked={crawling} type="checkbox" />
+
         <button onClick={onPlay}>{isPlay ? 'Stop' : 'Play'}</button>
+        <button onClick={onRestart}>Restart</button>
       </div>
       <canvas width={cSize} height={cSize} ref={canvasRef}></canvas>
     </div>

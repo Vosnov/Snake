@@ -12,6 +12,7 @@ export class Field extends Draw {
   timer?: NodeJS.Timer
   showPath = false
   stringPath: string[] = []
+  crawling = true
 
   constructor(canvas: HTMLCanvasElement, private countV = 6, step = 40) {
     super(canvas, step);
@@ -77,22 +78,24 @@ export class Field extends Draw {
  
   logic() {
     const snakePos = this.snake.getPosition()
-    const neighbors = this.getNeighbors(snakePos)
-    const appleIndex = this.findPathIndex(this.apple)
-
     const snakeIndex = this.findPathIndex(snakePos)
 
     let shortPath = this.hamiltonCycle.path[snakeIndex + 1] || this.hamiltonCycle.path[0]
-    let minDistance = this.calcDistance(snakeIndex + 1, appleIndex)
-    neighbors.forEach((neighbor) => {
-      const neighborIndex = this.findPathIndex(neighbor)
-      const calcDistance = this.calcDistance(neighborIndex, appleIndex)
-      if (calcDistance < minDistance && neighborIndex !== -1 && calcDistance > this.snake.getTailsLength() / 1.5) {
-        minDistance = calcDistance
-        shortPath = this.hamiltonCycle.path[neighborIndex]
-      }
+  
+    if (this.crawling) {
+      const appleIndex = this.findPathIndex(this.apple)
+      const neighbors = this.getNeighbors(snakePos)
+      let minDistance = this.calcDistance(snakeIndex + 1, appleIndex)
 
-    })
+      neighbors.forEach((neighbor) => {
+        const neighborIndex = this.findPathIndex(neighbor)
+        const calcDistance = this.calcDistance(neighborIndex, appleIndex)
+        if (calcDistance < minDistance && neighborIndex !== -1 && calcDistance > this.snake.getTailsLength() / 1.5) {
+          minDistance = calcDistance
+          shortPath = this.hamiltonCycle.path[neighborIndex]
+        }
+      })
+    }
 
     if (this.snake.getTails().map(t => `x${t.x}y${t.y}`).includes(`x${shortPath.x}y${shortPath.y}`)) {
       this.clear()
