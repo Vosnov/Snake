@@ -27,8 +27,7 @@ export class Field extends Draw {
     this.stringPath = this.hamiltonCycle.path.map(p => `x${p.x}y${p.y}`)
 
     this.apple =  new Apple(canvas, this.countV, this.step)
-    this.apple.x = this.hamiltonCycle.path[10].x
-    this.apple.y = this.hamiltonCycle.path[10].y
+    this.apple.randomSpawn([this.snake.getPosition()])
 
     this.setInterval()
     this.addListeners()
