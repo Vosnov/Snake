@@ -4,7 +4,6 @@ import { Field as FieldClass} from "../../utils";
 export const Field: FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [field, setField] = useState<FieldClass>()
-  const [cSize, setCSize] = useState(400);
   const [fSize, setFSize] = useState(10)
   const [speed, setSpeed] = useState(60)
   const [showPath, setShowPath] = useState(false)
@@ -28,10 +27,6 @@ export const Field: FC = () => {
   useEffect(() => {
     if (field) field.showPath = showPath
   }, [showPath, field])
-
-  const canvasSizeChange = useCallback<ChangeEventHandler<HTMLInputElement>>((e) => {
-    setCSize(parseInt(e.target.value))
-  }, [])
 
   const fieldSizeChange = useCallback<ChangeEventHandler<HTMLInputElement>>(e => {
     setFSize(parseInt(e.target.value))
@@ -76,9 +71,6 @@ export const Field: FC = () => {
   return (
     <div className="wrapper">
       <div className="inputs">
-        <label htmlFor="canvasSize">Canvas Size:</label>
-        <input id="canvasSize" onChange={canvasSizeChange} value={cSize} type="range" min={0} max={2000} />
-
         <label htmlFor="countV">Vertex Count:</label>
         <input id="countV" onChange={fieldSizeChange} value={fSize} type="range" step={2} min={4} max={60} />
 
@@ -94,7 +86,7 @@ export const Field: FC = () => {
         <button onClick={onPlay}>{isPlay ? 'Stop' : 'Play'}</button>
         <button onClick={onRestart}>Restart</button>
       </div>
-      <canvas width={cSize} height={cSize} ref={canvasRef}></canvas>
+      <canvas width={40 * fSize} height={40 * fSize} ref={canvasRef}></canvas>
     </div>
   )
 }
