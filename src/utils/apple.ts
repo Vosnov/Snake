@@ -4,7 +4,7 @@ import { Position } from "./point"
 export class Apple extends Draw {
   x: number = 0
   y: number = 0
-  fillColor = 'yellow'
+  fillColor = 'red'
 
   constructor(canvas: HTMLCanvasElement, private n: number, step?: number ) {
     super(canvas, step)
